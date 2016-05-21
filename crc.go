@@ -132,7 +132,8 @@ func (h *Hash) Reset() {
 // See hash.Hash interface.
 func (h *Hash) Sum(in []byte) []byte {
 	s := h.CRC()
-	for i := h.size - 1; i >= 0; i-- {
+	for i := h.size; i > 0; {
+		i--
 		in = append(in, byte(s>>(8*i)))
 	}
 	return in

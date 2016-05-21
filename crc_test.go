@@ -1,6 +1,7 @@
 package crc
 
 import (
+	"hash"
 	"testing"
 )
 
@@ -77,6 +78,71 @@ func TestCRCAlgorithms(t *testing.T) {
 	doTest(CRC64ECMA, "12345678901234567890", 0x0DA1B82EF5085A4A)
 	doTest(CRC64ECMA, "Introduction on CRC calculations", 0xCF8C40119AE90DCB)
 	doTest(CRC64ECMA, "Whenever digital data is stored or interfaced, data corruption might occur. Since the beginning of computer science, people have been thinking of ways to deal with this type of problem. For serial data they came up with the solution to attach a parity bit to each sent byte. This simple detection mechanism works if an odd number of bits in a byte changes, but an even number of false bits in one byte will not be detected by the parity check. To overcome this problem people have searched for mathematical sound mechanisms to detect multiple false bits.", 0x31610F76CFB272A5)
+}
+
+func TestSizeMethods(t *testing.T) {
+	testWidth := func(width uint, expectedSize int) {
+		h := NewHash(&Parameters{Width: width, Polynom: 1})
+		s := h.Size()
+		if s != expectedSize {
+			t.Errorf("Incorrect Size calculated for width %d:  %d when should be %d", width, s, expectedSize)
+		}
+		bs := h.BlockSize()
+		if bs != 1 {
+			t.Errorf("Incorrect Block Size returned for width %d:  %d when should always be 1", width, bs)
+		}
+	}
+
+	testWidth(3, 1)
+	testWidth(8, 1)
+	testWidth(12, 2)
+	testWidth(16, 2)
+	testWidth(32, 4)
+	testWidth(64, 8)
+
+}
+
+func TestHashInterface(t *testing.T) {
+	doTest := func(crcParams *Parameters, data string, crc uint64) {
+		// same test using table driven
+		var h hash.Hash = NewHash(crcParams)
+
+		// same test feeding data in chunks of different size
+		h.Reset()
+		var start = 0
+		var step = 1
+		for start < len(data) {
+			end := start + step
+			if end > len(data) {
+				end = len(data)
+			}
+			h.Write([]byte(data[start:end]))
+			start = end
+			step *= 2
+		}
+
+		buf := make([]byte, 0, 0)
+		buf = h.Sum(buf)
+
+		if len(buf) != h.Size() {
+			t.Errorf("Wrong number of bytes appended by Sum(): %d when should be %d", len(buf), h.Size())
+		}
+
+		calculated := uint64(0)
+		for _, b := range buf {
+			calculated <<= 8
+			calculated += uint64(b)
+		}
+
+		if calculated != crc {
+			t.Errorf("Incorrect CRC 0x%04x calculated for %s (should be 0x%04x)", calculated, data, crc)
+		}
+	}
+
+	doTest(&Parameters{Width: 8, Polynom: 0x07, Init: 0x00, ReflectIn: false, ReflectOut: false, FinalXor: 0x00}, "123456789", 0xf4)
+	doTest(CCITT, "12345678901234567890", 0xDA31)
+	doTest(CRC64ECMA, "Introduction on CRC calculations", 0xCF8C40119AE90DCB)
+	doTest(CRC32C, "Whenever digital data is stored or interfaced, data corruption might occur. Since the beginning of computer science, people have been thinking of ways to deal with this type of problem. For serial data they came up with the solution to attach a parity bit to each sent byte. This simple detection mechanism works if an odd number of bits in a byte changes, but an even number of false bits in one byte will not be detected by the parity check. To overcome this problem people have searched for mathematical sound mechanisms to detect multiple false bits.", 0x864FDAFC)
 }
 
 func BenchmarkCCITT(b *testing.B) {
