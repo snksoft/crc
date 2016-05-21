@@ -1,4 +1,4 @@
-src [![GoDoc](https://godoc.org/github.com/snksoft/src?status.png)](https://godoc.org/github.com/sknsoft/crc) 
+src [![GoDoc](https://godoc.org/github.com/snksoft/src?status.png)](https://godoc.org/github.com/sknsoft/crc)
 ========
 This package implements generic CRC calculations up to 64 bits wide.
 It aims to be fairly fast and fairly complete, allowing users to match pretty much
@@ -12,7 +12,7 @@ This package has been largely inspired by Ross Williams' 1993 paper "A Painless 
 To install, simply execute:
 
 ```
-go get github.com/sknsoft/crc
+go get github.com/snksoft/crc
 ```
 
 ## Usage
@@ -23,7 +23,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/sknsoft/crc"
+	"github.com/snksoft/crc"
 )
 
 func main() {
@@ -39,7 +39,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/sknsoft/crc"
+	"github.com/snksoft/crc"
 )
 
 func main() {
@@ -64,7 +64,7 @@ Beware that Hash instance is not thread safe. If you want to do parallel CRC cal
  	hash2 := &crc.Hash{}
 	*hash2 = *hash
 ```
- or simply 
+ or simply
  ```go
  	var hash2 = *hash
  ```
