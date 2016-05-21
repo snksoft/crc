@@ -1,4 +1,4 @@
-src [![GoDoc](https://godoc.org/github.com/snksoft/src?status.png)](https://godoc.org/github.com/sknsoft/crc)
+src [![GoDoc](https://godoc.org/github.com/snksoft/src?status.png)](https://godoc.org/github.com/snksoft/crc)
 ========
 This package implements generic CRC calculations up to 64 bits wide.
 It aims to be fairly fast and fairly complete, allowing users to match pretty much
