@@ -82,7 +82,7 @@ func TestCRCAlgorithms(t *testing.T) {
 
 func TestSizeMethods(t *testing.T) {
 	testWidth := func(width uint, expectedSize int) {
-		h := NewHash(&Parameters{Width: width, Polynom: 1})
+		h := NewHash(&Parameters{Width: width, Polynomial: 1})
 		s := h.Size()
 		if s != expectedSize {
 			t.Errorf("Incorrect Size calculated for width %d:  %d when should be %d", width, s, expectedSize)
@@ -139,7 +139,7 @@ func TestHashInterface(t *testing.T) {
 		}
 	}
 
-	doTest(&Parameters{Width: 8, Polynom: 0x07, Init: 0x00, ReflectIn: false, ReflectOut: false, FinalXor: 0x00}, "123456789", 0xf4)
+	doTest(&Parameters{Width: 8, Polynomial: 0x07, Init: 0x00, ReflectIn: false, ReflectOut: false, FinalXor: 0x00}, "123456789", 0xf4)
 	doTest(CCITT, "12345678901234567890", 0xDA31)
 	doTest(CRC64ECMA, "Introduction on CRC calculations", 0xCF8C40119AE90DCB)
 	doTest(CRC32C, "Whenever digital data is stored or interfaced, data corruption might occur. Since the beginning of computer science, people have been thinking of ways to deal with this type of problem. For serial data they came up with the solution to attach a parity bit to each sent byte. This simple detection mechanism works if an odd number of bits in a byte changes, but an even number of false bits in one byte will not be detected by the parity check. To overcome this problem people have searched for mathematical sound mechanisms to detect multiple false bits.", 0x864FDAFC)

@@ -14,38 +14,38 @@ package crc
 // Parameters represents set of parameters defining a particular CRC algorithm.
 type Parameters struct {
 	Width      uint   // Width of the CRC expressed in bits
-	Polynom    uint64 // Polynom used in this CRC calculation
-	ReflectIn  bool   // Refin indicates whether input bytes should be reflected
-	ReflectOut bool   // Refout indicates whether input bytes should be reflected
+	Polynomial uint64 // Polynomial used in this CRC calculation
+	ReflectIn  bool   // ReflectIn indicates whether input bytes should be reflected
+	ReflectOut bool   // ReflectOut indicates whether input bytes should be reflected
 	Init       uint64 // Init is initial value for CRC calculation
 	FinalXor   uint64 // Xor is a value for final xor to be applied before returning result
 }
 
 var (
 	// CCITT CRC parameters
-	CCITT = &Parameters{Width: 16, Polynom: 0x1021, Init: 0xFFFF, ReflectIn: false, ReflectOut: false, FinalXor: 0x0}
+	CCITT = &Parameters{Width: 16, Polynomial: 0x1021, Init: 0xFFFF, ReflectIn: false, ReflectOut: false, FinalXor: 0x0}
 	// CRC16 CRC parameters, also known as ARC
-	CRC16 = &Parameters{Width: 16, Polynom: 0x8005, Init: 0x0000, ReflectIn: true, ReflectOut: true, FinalXor: 0x0}
+	CRC16 = &Parameters{Width: 16, Polynomial: 0x8005, Init: 0x0000, ReflectIn: true, ReflectOut: true, FinalXor: 0x0}
 	// XMODEM is a set of CRC parameters commonly referred as "XMODEM"
-	XMODEM = &Parameters{Width: 16, Polynom: 0x1021, Init: 0x0000, ReflectIn: false, ReflectOut: false, FinalXor: 0x0}
+	XMODEM = &Parameters{Width: 16, Polynomial: 0x1021, Init: 0x0000, ReflectIn: false, ReflectOut: false, FinalXor: 0x0}
 	// XMODEM2 is another set of CRC parameters commonly referred as "XMODEM"
-	XMODEM2 = &Parameters{Width: 16, Polynom: 0x8408, Init: 0x0000, ReflectIn: true, ReflectOut: true, FinalXor: 0x0}
+	XMODEM2 = &Parameters{Width: 16, Polynomial: 0x8408, Init: 0x0000, ReflectIn: true, ReflectOut: true, FinalXor: 0x0}
 
 	// CRC32 is by far the the most commonly used CRC-32 polynom and set of parameters
-	CRC32 = &Parameters{Width: 32, Polynom: 0x04C11DB7, Init: 0xFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFF}
+	CRC32 = &Parameters{Width: 32, Polynomial: 0x04C11DB7, Init: 0xFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFF}
 	// IEEE is an alias to CRC32
 	IEEE = CRC32
 	// Castagnoli polynomial. used in iSCSI. And also provided by hash/crc32 package.
-	Castagnoli = &Parameters{Width: 32, Polynom: 0x1EDC6F41, Init: 0xFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFF}
+	Castagnoli = &Parameters{Width: 32, Polynomial: 0x1EDC6F41, Init: 0xFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFF}
 	// CRC32C is an alias to Castagnoli
 	CRC32C = Castagnoli
 	// Koopman polynomial
-	Koopman = &Parameters{Width: 32, Polynom: 0x741B8CD7, Init: 0xFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFF}
+	Koopman = &Parameters{Width: 32, Polynomial: 0x741B8CD7, Init: 0xFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFF}
 
 	// CRC64ISO is set of parameters commonly known as CRC64-ISO
-	CRC64ISO = &Parameters{Width: 64, Polynom: 0x000000000000001B, Init: 0xFFFFFFFFFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFFFFFFFFFF}
+	CRC64ISO = &Parameters{Width: 64, Polynomial: 0x000000000000001B, Init: 0xFFFFFFFFFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFFFFFFFFFF}
 	// CRC64ECMA is set of parameters commonly known as CRC64-ECMA
-	CRC64ECMA = &Parameters{Width: 64, Polynom: 0x42F0E1EBA9EA3693, Init: 0xFFFFFFFFFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFFFFFFFFFF}
+	CRC64ECMA = &Parameters{Width: 64, Polynomial: 0x42F0E1EBA9EA3693, Init: 0xFFFFFFFFFFFFFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFFFFFFFFFFFFFF}
 )
 
 // reflect reverses order of last count bits
@@ -81,7 +81,7 @@ func CalculateCRC(crcParams *Parameters, data []byte) uint64 {
 		curValue ^= (curByte << (crcParams.Width - 8))
 		for j := 0; j < 8; j++ {
 			if (curValue & topbit) != 0 {
-				curValue = (curValue << 1) ^ crcParams.Polynom
+				curValue = (curValue << 1) ^ crcParams.Polynomial
 			} else {
 				curValue = (curValue << 1)
 			}
@@ -168,14 +168,14 @@ func (h *Hash) CRC() uint64 {
 	return (ret ^ h.crcParams.FinalXor) & h.mask
 }
 
-// CalculateCRC is a convinience function allowing to calculate CRC in one call.
+// CalculateCRC is a convenience function allowing to calculate CRC in one call.
 func (h *Hash) CalculateCRC(data []byte) uint64 {
 	h.Reset() // just in case
 	h.Update(data)
 	return h.CRC()
 }
 
-// NewHash creates a new Hash isnstance configured for table driven
+// NewHash creates a new Hash instance configured for table driven
 // CRC calculation according to parameters specified.
 func NewHash(crcParams *Parameters) *Hash {
 	ret := &Hash{crcParams: *crcParams}
@@ -197,13 +197,13 @@ func NewHash(crcParams *Parameters) *Hash {
 	return ret
 }
 
-// CRC16 is a convinience method to spare end users from explicit type conversion every time this package is used.
+// CRC16 is a convenience method to spare end users from explicit type conversion every time this package is used.
 // Underneath, it just calls CRC() method.
 func (h *Hash) CRC16() uint16 {
 	return uint16(h.CRC())
 }
 
-// CRC32 is a convinience method to spare end users from explicit type conversion every time this package is used.
+// CRC32 is a convenience method to spare end users from explicit type conversion every time this package is used.
 // Underneath, it just calls CRC() method.
 func (h *Hash) CRC32() uint32 {
 	return uint32(h.CRC())
