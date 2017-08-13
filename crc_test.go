@@ -39,6 +39,11 @@ func TestCRCAlgorithms(t *testing.T) {
 		}
 	}
 
+	doTest(X25, "123456789", 0x906E)
+	doTest(X25, "12345678901234567890", 0xA286)
+	doTest(X25, "Introduction on CRC calculations", 0xF9B6)
+	doTest(X25, "Whenever digital data is stored or interfaced, data corruption might occur. Since the beginning of computer science, people have been thinking of ways to deal with this type of problem. For serial data they came up with the solution to attach a parity bit to each sent byte. This simple detection mechanism works if an odd number of bits in a byte changes, but an even number of false bits in one byte will not be detected by the parity check. To overcome this problem people have searched for mathematical sound mechanisms to detect multiple false bits.", 0x68B1)
+
 	doTest(CCITT, "123456789", 0x29B1)
 	doTest(CCITT, "12345678901234567890", 0xDA31)
 	doTest(CCITT, "Introduction on CRC calculations", 0xC87E)
