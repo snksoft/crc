@@ -22,6 +22,8 @@ type Parameters struct {
 }
 
 var (
+	// X-25 CRC parameters, also known as CRC-16/IBM-SDLC, CRC-16/ISO-HDLC, CRC-B
+	X25 = &Parameters{Width: 16, Polynomial: 0x1021, Init: 0xFFFF, ReflectIn: true, ReflectOut: true, FinalXor: 0xFFFF}
 	// CCITT CRC parameters
 	CCITT = &Parameters{Width: 16, Polynomial: 0x1021, Init: 0xFFFF, ReflectIn: false, ReflectOut: false, FinalXor: 0x0}
 	// CRC16 CRC parameters, also known as ARC
