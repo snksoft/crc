@@ -1,4 +1,4 @@
-src [![GoDoc](https://godoc.org/github.com/snksoft/src?status.png)](https://godoc.org/github.com/snksoft/crc)
+crc [![GoDoc](https://godoc.org/github.com/snksoft/src?status.png)](https://godoc.org/github.com/snksoft/crc)
 ========
 This package implements generic CRC calculations up to 64 bits wide.
 It aims to be fairly fast and fairly complete, allowing users to match pretty much
@@ -17,7 +17,7 @@ go get github.com/snksoft/crc
 
 ## Usage
 
-Using src is easy. Here is an example of calculating CCITT crc.
+Using `crc` is easy. Here is an example of calculating a CCITT crc.
 ```go
 package main
 
@@ -33,7 +33,8 @@ func main() {
 }
 ```
 
-For larger data, table driven implementation is faster. Here is how to use it. Note that crc.Hash impements hash.Hash interface, so you can use it instead if you want.
+For larger data, table driven implementation is faster. Note that `crc.Hash` implements `hash.Hash` interface, so you can use it instead if you want.  
+Here is how to use it:
 ```go
 package main
 
@@ -58,13 +59,13 @@ func main() {
 }
 ```
 ## Notes
-Beware that Hash instance is not thread safe. If you want to do parallel CRC calculations, then either use NewHash() to create multiple Hash instances or simply make a copy of Hash whehever you need it. Latter option avoids recalculating CRC table, but keep in mind that NewHash() returns a pointer, so simple assignement will point to the same instance.
- Use either
+Beware that Hash instance is not thread safe. If you want to do parallel CRC calculations, then either use `NewHash()` to create multiple Hash instances or simply make a copy of Hash whehever you need it. Latter option avoids recalculating CRC table, but keep in mind that `NewHash()` returns a pointer, so simple assignement will point to the same instance.
+Use either
  ```go
- 	hash2 := &crc.Hash{}
-	*hash2 = *hash
+hash2 := &crc.Hash{}
+*hash2 = *hash
 ```
- or simply
+or simply
  ```go
- 	var hash2 = *hash
+var hash2 = *hash
  ```
