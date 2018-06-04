@@ -69,26 +69,33 @@ func reflect(in uint64, count uint) uint64 {
 // It is relatively slow for large amounts of data, but does not require
 // any preparation steps. As a result, it might be faster in some cases
 // then building a table required for faster calculation.
+//
+// Note: this implementation follows section 8 ("A Straightforward CRC Implementation")
+// of Ross N. Williams paper as even though final/sample implementation of this algorithm
+// provided near the end of that paper (and followed by most other implementations)
+// is a bit faster, it does not work for polynomials shorter then 8 bits. And if you need
+// speed, you shoud probably be using table based implementation anyway.
 func CalculateCRC(crcParams *Parameters, data []byte) uint64 {
 
 	curValue := crcParams.Init
-	topbit := uint64(1) << (crcParams.Width - 1)
-	mask := (topbit << 1) - 1
+	topBit := uint64(1) << (crcParams.Width - 1)
+	mask := (topBit << 1) - 1
 
 	for i := 0; i < len(data); i++ {
 		var curByte = uint64(data[i]) & 0x00FF
 		if crcParams.ReflectIn {
 			curByte = reflect(curByte, 8)
 		}
-		curValue ^= (curByte << (crcParams.Width - 8))
-		for j := 0; j < 8; j++ {
-			if (curValue & topbit) != 0 {
-				curValue = (curValue << 1) ^ crcParams.Polynomial
-			} else {
-				curValue = (curValue << 1)
+		for j := uint64(0x0080); j != 0; j >>= 1 {
+			bit := curValue & topBit
+			curValue <<= 1
+			if (curByte & j) != 0 {
+				bit = bit ^ topBit
+			}
+			if bit != 0 {
+				curValue = curValue ^ crcParams.Polynomial
 			}
 		}
-
 	}
 	if crcParams.ReflectOut {
 		curValue = reflect(curValue, crcParams.Width)
@@ -153,6 +160,10 @@ func (h *Hash) Update(p []byte) {
 		for _, v := range p {
 			h.curValue = h.crctable[(byte(h.curValue)^v)&0xFF] ^ (h.curValue >> 8)
 		}
+	} else if h.crcParams.Width < 8 {
+		for _, v := range p {
+			h.curValue = h.crctable[((((byte)(h.curValue<<(8-h.crcParams.Width)))^v)&0xFF)] ^ (h.curValue << 8)
+		}
 	} else {
 		for _, v := range p {
 			h.curValue = h.crctable[((byte(h.curValue>>(h.crcParams.Width-8))^v)&0xFF)] ^ (h.curValue << 8)
@@ -197,6 +208,12 @@ func NewHash(crcParams *Parameters) *Hash {
 	ret.Reset()
 
 	return ret
+}
+
+// CRC8 is a convenience method to spare end users from explicit type conversion every time this package is used.
+// Underneath, it just calls CRC() method.
+func (h *Hash) CRC8() uint8 {
+	return uint8(h.CRC())
 }
 
 // CRC16 is a convenience method to spare end users from explicit type conversion every time this package is used.
