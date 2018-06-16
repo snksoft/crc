@@ -56,6 +56,13 @@ func TestCRCAlgorithms(t *testing.T) {
 			}
 		}
 
+		// Test Hash's table directly and see there is no difference
+		table := tableDriven.Table()
+		calculated = table.CalculateCRC([]byte(data))
+		if calculated != crc {
+			t.Errorf("Incorrect CRC 0x%04x calculated for %s (should be 0x%04x)", calculated, data, crc)
+		}
+
 	}
 
 	doTest(X25, "123456789", 0x906E)
@@ -156,9 +163,11 @@ func TestCRCAlgorithms(t *testing.T) {
 	doTestWithParameters(15, 0x4599, 0x00, false, false, 0x00, 0x2857, longText)
 	doTestWithParameters(15, 0x6815, 0x00, false, false, 0x0001, 0x2566, "123456789") // CRC-15/MPT1327
 
-	doTestWithParameters(21, 0x102899, 0x000000, false, false, 0x000000, 0x0ed841, "123456789")         // CRC-21/CAN-FD
-	doTestWithParameters(24, 0x864cfb, 0xb704ce, false, false, 0x000000, 0x21cf02, "123456789")         // CRC-24
-	doTestWithParameters(24, 0x5d6dcb, 0xfedcba, false, false, 0x000000, 0x7979bd, "123456789")         // CRC-24/FLEXRAY-A
+	doTestWithParameters(21, 0x102899, 0x000000, false, false, 0x000000, 0x0ed841, "123456789") // CRC-21/CAN-FD
+	doTestWithParameters(24, 0x864cfb, 0xb704ce, false, false, 0x000000, 0x21cf02, "123456789") // CRC-24
+	doTestWithParameters(24, 0x5d6dcb, 0xfedcba, false, false, 0x000000, 0x7979bd, "123456789") // CRC-24/FLEXRAY-A
+	doTestWithParameters(24, 0x00065b, 0x555555, true, true, 0x000000, 0xc25a56, "123456789")   // "CRC-24/BLE"
+
 	doTestWithParameters(31, 0x04c11db7, 0x7fffffff, false, false, 0x7fffffff, 0x0ce9e46c, "123456789") // CRC-31/PHILIPS
 }
 
