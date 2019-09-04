@@ -28,6 +28,8 @@ var (
 	CCITT = &Parameters{Width: 16, Polynomial: 0x1021, Init: 0xFFFF, ReflectIn: false, ReflectOut: false, FinalXor: 0x0}
 	// CRC16 CRC parameters, also known as ARC
 	CRC16 = &Parameters{Width: 16, Polynomial: 0x8005, Init: 0x0000, ReflectIn: true, ReflectOut: true, FinalXor: 0x0}
+	// CRC16MODBUS
+	CRC16MODBUS = &Parameters{Width: 16, Polynomial: 0x8005, Init: 0xffff, ReflectIn: true, ReflectOut: true, FinalXor: 0x0}
 	// XMODEM is a set of CRC parameters commonly referred as "XMODEM"
 	XMODEM = &Parameters{Width: 16, Polynomial: 0x1021, Init: 0x0000, ReflectIn: false, ReflectOut: false, FinalXor: 0x0}
 	// XMODEM2 is another set of CRC parameters commonly referred as "XMODEM"
